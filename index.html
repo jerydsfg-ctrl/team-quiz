@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F2F4F3" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1316" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Team Profile">
+<meta name="robots" content="noindex">
+<title>Team Profile Quiz</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231D5C4F'/%3E%3Crect x='7' y='7' width='8' height='8' rx='2' fill='%23D55E00'/%3E%3Crect x='17' y='7' width='8' height='8' rx='2' fill='%23E69F00'/%3E%3Crect x='7' y='17' width='8' height='8' rx='2' fill='%23009E73'/%3E%3Crect x='17' y='17' width='8' height='8' rx='2' fill='%2356B4E9'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,650&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#F2F4F3; --surface:#FFFFFF; --ink:#18212B; --muted:#5B6672; --line:#DCE1E4; --line-strong:#C3CBD0;
+  --accent:#1D5C4F; --accent-ink:#FFFFFF; --accent-soft:#E2EFEB;
+  --good:#18794E; --good-soft:#E3F4EA; --warn:#8A5A00; --warn-soft:#FBF0DA; --bad:#B42318; --bad-soft:#FDECEA;
+  --D:#D55E00; --I:#E69F00; --S:#009E73; --C:#0072B2;
+  --radius:14px; --shadow:0 1px 2px rgba(20,30,40,.05), 0 8px 24px rgba(20,30,40,.06);
+  --display:"Bricolage Grotesque", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --body:"Figtree", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0E1316; --surface:#161D21; --ink:#E7ECEE; --muted:#97A3AB; --line:#27323A; --line-strong:#3A4852;
+    --accent:#7CC6B3; --accent-ink:#0E1316; --accent-soft:#1C2E2A;
+    --good:#6FD19C; --good-soft:#15291F; --warn:#E7B45A; --warn-soft:#2E2614; --bad:#FF8A80; --bad-soft:#331A18;
+    --C:#56B4E9; --shadow:none;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--display);font-weight:650;letter-spacing:-.02em;line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(28px,6vw,38px)}
+h2{font-size:22px}
+h3{font-size:17px}
+p{margin:0}
+button{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:8px}
+.wrap{max-width:660px;margin:0 auto;padding:max(16px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(110px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+
+/* header */
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:6px 18px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:650;font-size:17px;letter-spacing:-.01em}
+.mark{display:grid;grid-template-columns:repeat(2,9px);gap:3px}
+.mark i{width:9px;height:9px;border-radius:2.5px;display:block}
+.saved{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;opacity:0;transition:opacity .3s}
+.saved.on{opacity:1}
+.saved::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--good)}
+
+.progress{margin-bottom:18px}
+.progress-row{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:7px;font-variant-numeric:tabular-nums}
+.progress-row b{color:var(--ink);font-weight:600}
+.track{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.track i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .35s ease}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+.stack{display:flex;flex-direction:column;gap:16px}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.lead{font-size:17px;color:var(--muted)}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+
+.banner{border-radius:12px;padding:12px 14px;font-size:14px;margin-bottom:16px;background:var(--warn-soft);color:var(--warn)}
+.banner.bad{background:var(--bad-soft);color:var(--bad)}
+
+/* welcome */
+.facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.fact{border:1px solid var(--line);border-radius:12px;padding:12px}
+.fact b{display:block;font-family:var(--display);font-size:20px;font-variant-numeric:tabular-nums}
+.fact span{font-size:13px;color:var(--muted)}
+.consent{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:12px;background:var(--accent-soft);cursor:pointer}
+.consent input{width:22px;height:22px;margin:2px 0 0;accent-color:var(--accent);flex:0 0 auto}
+ul.plain{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+
+/* form */
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fields .full{grid-column:1/-1}
+label.f{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600}
+label.f .opt{font-weight:400;color:var(--muted)}
+input[type=text],input[type=email],input[type=date],textarea{
+  font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line-strong);
+  border-radius:10px;padding:11px 12px;min-height:46px;width:100%}
+input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.err{font-size:13px;color:var(--bad);font-weight:500;min-height:0}
+input[aria-invalid=true]{border-color:var(--bad)}
+
+/* DISC */
+.block-q{font-size:15px;color:var(--muted);margin-bottom:14px}
+.stmts{display:flex;flex-direction:column;gap:10px}
+.stmt{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;padding:10px 10px 10px 14px;border:1px solid var(--line);border-radius:12px;transition:border-color .15s, background .15s}
+.stmt.is-most{border-color:var(--accent);background:var(--accent-soft)}
+.stmt.is-least{border-color:var(--line-strong);background:var(--bg)}
+.stmt-text{font-weight:600;font-size:16px;line-height:1.3}
+.pick{min-width:66px;min-height:44px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;padding:0 10px}
+.pick:hover{border-color:var(--ink);color:var(--ink)}
+.pick.most[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.pick.least[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.hint{font-size:14px;color:var(--muted);margin-top:12px;min-height:22px}
+.hint.warn{color:var(--warn)}
+
+/* Likert */
+.items{display:flex;flex-direction:column;gap:22px}
+.item p{font-weight:600;margin-bottom:10px;line-height:1.4}
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.scale button{min-height:46px;border-radius:10px;border:1px solid var(--line-strong);background:var(--surface);font-weight:650;font-size:16px;cursor:pointer;color:var(--muted);font-variant-numeric:tabular-nums}
+.scale button:hover{border-color:var(--ink);color:var(--ink)}
+.scale button[aria-pressed=true]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.scale-ends{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:5px}
+.item.missing p::after{content:" · not answered";font-weight:500;color:var(--warn);font-size:13px}
+
+/* buttons + bottom bar */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border-radius:12px;border:1px solid transparent;font-weight:650;font-size:16px;cursor:pointer;text-decoration:none;transition:opacity .15s, transform .1s}
+.btn:active{transform:scale(.99)}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:var(--surface);border-color:var(--line-strong);color:var(--ink)}
+.btn.quiet{background:transparent;color:var(--muted);padding:0 10px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.block{width:100%}
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:12px max(16px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left))}
+.bar-in{max-width:660px;margin:0 auto;display:flex;gap:10px}
+.bar-in .btn{flex:1}
+.bar-in .btn.ghost{flex:0 0 auto}
+
+/* review */
+.grid-jump{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.jump{min-height:42px;border-radius:9px;border:1px solid var(--line-strong);background:var(--surface);font-size:14px;font-weight:650;cursor:pointer;font-variant-numeric:tabular-nums;color:var(--bad)}
+.jump.ok{background:var(--accent-soft);border-color:transparent;color:var(--accent)}
+.status-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-block:4px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:650;padding:4px 10px;border-radius:99px;background:var(--line);color:var(--muted)}
+.chip.good{background:var(--good-soft);color:var(--good)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+
+/* results */
+.hero-style{display:flex;gap:14px;align-items:center}
+.style-tiles{display:flex;gap:6px}
+.style-tiles span{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-family:var(--display);font-size:24px;font-weight:650;color:#fff}
+.bars{display:flex;flex-direction:column;gap:12px}
+.brow{display:grid;grid-template-columns:118px 1fr 40px;align-items:center;gap:10px;font-size:14px}
+.brow .lab{display:flex;align-items:center;gap:8px;font-weight:600}
+.brow .lab i{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;color:#fff;font-style:normal;font-size:12px;font-weight:700}
+.brow .bt{height:14px;border-radius:99px;background:var(--line);overflow:hidden}
+.brow .bt b{display:block;height:100%;border-radius:99px}
+.brow .val{text-align:right;font-variant-numeric:tabular-nums;font-weight:650}
+.note{border-left:3px solid var(--line-strong);padding-left:12px}
+.radar{width:100%;max-width:420px;display:block;margin:0 auto}
+.radar text{font-family:var(--body);font-size:11.5px;font-weight:600;fill:var(--muted)}
+.radar .grid{fill:none;stroke:var(--line);stroke-width:1}
+.radar .axis{stroke:var(--line);stroke-width:1}
+.radar .shape{fill:var(--accent);fill-opacity:.22;stroke:var(--accent);stroke-width:2;stroke-linejoin:round}
+.radar .pt{fill:var(--accent)}
+table.scores{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+table.scores th,table.scores td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+table.scores th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+table.scores td:last-child,table.scores th:last-child{text-align:right}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pair > div{border:1px solid var(--line);border-radius:12px;padding:14px}
+.tips{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.actions .full{grid-column:1/-1}
+.sendbox{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+.fade{animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.fade{animation:none}.track i{transition:none}}
+
+.foot{text-align:center;color:var(--muted);font-size:13px;margin-top:28px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+textarea.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;min-height:220px}
+
+@media (max-width:520px){
+  .card{padding:18px}
+  .fields{grid-template-columns:1fr}
+  .facts{grid-template-columns:repeat(3,1fr);gap:8px}
+  .fact{padding:10px}
+  .pick{min-width:58px;padding:0 8px;font-size:13.5px}
+  .stmt{padding:8px 8px 8px 12px;gap:6px}
+  .brow{grid-template-columns:100px 1fr 36px}
+  .pair{grid-template-columns:1fr}
+  .actions{grid-template-columns:1fr}
+}
+@media print{
+  body{background:#fff;color:#000}
+  .top .saved,.bar,.actions,.sendbox .btn,.no-print,.foot{display:none!important}
+  .wrap{padding:0;max-width:none}
+  .card{box-shadow:none;border-color:#ccc;break-inside:avoid}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><span class="mark" aria-hidden="true"><i style="background:var(--D)"></i><i style="background:var(--I)"></i><i style="background:var(--S)"></i><i style="background:var(--C)"></i></span><span id="brandName">Team Profile</span></div>
+    <div class="saved" id="saved" role="status" aria-live="polite">Saved</div>
+  </header>
+  <div id="storageBanner" class="banner" hidden>Your browser is blocking storage, so progress can't be saved. Keep this page open until you finish.</div>
+  <main id="app" tabindex="-1"></main>
+  <div class="foot" id="foot"></div>
+</div>
+<div class="bar" id="bar" hidden><div class="bar-in" id="barIn"></div></div>
+
+<script>
+/* =====================================================================
+   CONFIG: the only part most people need to edit.
+   ===================================================================== */
+const CONFIG = {
+  companyName: "",              // e.g. "Gillum Agency". Leave blank to just say "the team".
+  leadName: "your team lead",   // shown as "Your results were sent to ___"
+
+  // Google Form that receives results. Fill these in using the #setup page (open this site with #setup at the end of the address).
+  googleForm: {
+    formId: "1FAIpQLSeOBc3ahZ5t275Jo0y56SCVu7g0KxPrpR1qTL7jSjXlnt5flA",   // "Team Profile Results" form
+    fields: {                   // entry ids for each question
+      name: "entry.667487254", email: "entry.282192135", role: "entry.500193696", team: "entry.1916424856",
+      start: "entry.321182973", manager: "entry.1937614426",
+      discstyle: "entry.1952340294", discscores: "entry.850896363", moneystyle: "entry.326243242",
+      coaching: "entry.20663162", data: "entry.1637906498"
+    }
+  }
+};
+
+/* =====================================================================
+   QUESTION BANK. Edit wording freely; keep each block's D / I / S / C tags.
+   ===================================================================== */
+const DIMS = ["D","I","S","C"];
+const DISC = {
+  D:{ name:"Dominance", word:"Direct",
+      about:"You're driven by results. You move quickly, make decisions with confidence, and take problems on directly. You do your best work with a clear goal, room to act, and a challenge worth solving.",
+      blind:"Taking charge quickly may not come naturally to you. When the team is stuck, practice making the call and owning it." },
+  I:{ name:"Influence", word:"Influential",
+      about:"You're energized by people. You bring enthusiasm, build connections fast, and persuade through optimism. You do your best work when you're collaborating, sharing ideas, and getting others excited.",
+      blind:"Promoting your ideas and building buzz may take extra effort. Share your progress and wins out loud so others see them." },
+  S:{ name:"Steadiness", word:"Steady",
+      about:"You bring calm and consistency. You're patient, loyal, and a strong listener who keeps the team grounded. You do your best work with clear expectations, a supportive team, and time to adjust to change.",
+      blind:"Slow, steady follow-through may be a stretch. Watch for moving on to the next thing before others are ready." },
+  C:{ name:"Conscientiousness", word:"Careful",
+      about:"You care about getting it right. You're analytical, organized, and hold a high bar for quality. You do your best work with clear processes, accurate information, and time to think things through.",
+      blind:"Detail work and double-checking may be easy to skip. A quick review step before you ship will catch what slips by." }
+};
+const BLENDS = {
+  DI:"Bold and persuasive. You set the direction and rally people behind it.",
+  DS:"Determined and dependable. You push for results and keep your commitments.",
+  DC:"Decisive and exacting. You drive hard toward high-quality results.",
+  ID:"Energetic and assertive. You inspire action and aren't afraid to lead it.",
+  IS:"Warm and supportive. You build relationships and keep the team connected.",
+  IC:"Engaging and thoughtful. You pitch ideas and back them up with detail.",
+  SD:"Steady and determined. You follow through quietly until the job is done.",
+  SI:"Friendly and patient. People trust you and enjoy working alongside you.",
+  SC:"Reliable and careful. You keep work consistent, accurate, and on track.",
+  CD:"Precise and driven. You set high standards and hold the line on them.",
+  CI:"Analytical and diplomatic. You explain complex ideas in ways people accept.",
+  CS:"Methodical and calm. You bring order, accuracy, and patience to your work."
+};
+// 28 blocks. Each statement: [text, dimension]. Order here doesn't matter; it's shuffled per person.
+const DISC_BLOCKS = [
+  ["Decisive","D","Outgoing","I","Patient","S","Precise","C"],
+  ["Direct","D","Enthusiastic","I","Steady","S","Careful","C"],
+  ["Competitive","D","Talkative","I","Loyal","S","Thorough","C"],
+  ["Bold","D","Persuasive","I","Calm","S","Accurate","C"],
+  ["Driven","D","Optimistic","I","Supportive","S","Systematic","C"],
+  ["Assertive","D","Sociable","I","Easygoing","S","Analytical","C"],
+  ["Results-focused","D","Inspiring","I","Dependable","S","Detail-oriented","C"],
+  ["Takes charge","D","Expressive","I","A good listener","S","Follows the rules","C"],
+  ["Determined","D","Playful","I","Consistent","S","Cautious","C"],
+  ["Daring","D","Charming","I","Gentle","S","Disciplined","C"],
+  ["Forceful","D","Animated","I","Content","S","Orderly","C"],
+  ["Independent","D","Spontaneous","I","Cooperative","S","Logical","C"],
+  ["Ambitious","D","Friendly","I","Considerate","S","Methodical","C"],
+  ["Firm","D","Lively","I","Agreeable","S","Exact","C"],
+  ["Challenges how things are done","D","Energizes the room","I","Keeps the peace","S","Double-checks the work","C"],
+  ["Moves fast","D","Thinks out loud","I","Takes time to adjust","S","Plans before acting","C"],
+  ["Wants to win","D","Wants to be liked","I","Wants stability","S","Wants to be right","C"],
+  ["Blunt","D","Warm","I","Modest","S","Reserved","C"],
+  ["Self-assured","D","Popular","I","Even-tempered","S","Conscientious","C"],
+  ["Tackles problems head-on","D","Brings people together","I","Offers a helping hand","S","Researches the options","C"],
+  ["Pioneering","D","Fun-loving","I","Reliable","S","Quality-minded","C"],
+  ["Strong-willed","D","Trusting","I","Accommodating","S","Skeptical","C"],
+  ["Adventurous","D","Convincing","I","Predictable","S","Tactful","C"],
+  ["Impatient","D","Easily distracted","I","Slow to change","S","Overly critical","C"],
+  ["Commanding","D","Magnetic","I","Patient with people","S","Fact-driven","C"],
+  ["Goal-oriented","D","People-oriented","I","Team-oriented","S","Process-oriented","C"],
+  ["Speaks up first","D","Tells stories","I","Asks how others feel","S","Asks for the data","C"],
+  ["Pushes harder under pressure","D","Talks it out under pressure","I","Goes along to keep the peace under pressure","S","Retreats into the details under pressure","C"]
+].map((r,i)=>({ id:"b"+(i+1), s:[[r[0],r[1]],[r[2],r[3]],[r[4],r[5]],[r[6],r[7]]] }));
+
+/* Wealth Mandala: 8 archetypes. Rename freely (keep the ids). */
+const ARCH = [
+  { id:"builder",  name:"Builder",           short:"Builder",    tag:"earning and creating value",
+    strong:"You see money as something you create. You look for ways to add value, earn more, and build things of your own.",
+    edge:"Creating new income may not be where your attention goes. Small experiments, like a skill you could charge for, can open this up." },
+  { id:"steward",  name:"Steward",           short:"Steward",    tag:"protecting and preserving",
+    strong:"You protect what you have. Safety nets, careful spending, and looking after resources come naturally to you.",
+    edge:"Protecting what you have may get less attention. A simple emergency fund or a check on insurance is an easy first step." },
+  { id:"growth",   name:"Growth Seeker",     short:"Growth",     tag:"investing and compounding",
+    strong:"You think long-term. You like putting money to work and letting time and compounding do the heavy lifting.",
+    edge:"Investing may feel distant or complicated. Automating a small, regular amount is a low-effort way to start." },
+  { id:"giver",    name:"Giver",             short:"Giver",      tag:"generosity and contribution",
+    strong:"Generosity is part of how you use money. Helping people and causes you care about brings you real satisfaction.",
+    edge:"Giving may not be a regular part of your plan. Picking one cause and a small set amount can make it intentional." },
+  { id:"minimal",  name:"Minimalist",        short:"Minimalist", tag:"sufficiency and simplicity",
+    strong:"You know what's enough. You avoid clutter and impulse buys, and you value freedom and time over more stuff.",
+    edge:"Knowing your 'enough' may be less defined. Noticing which purchases actually add to your life can bring clarity." },
+  { id:"risk",     name:"Risk-Taker",        short:"Risk-Taker", tag:"opportunity and leverage",
+    strong:"You're comfortable with risk when the upside is real. You spot openings and act while others hesitate.",
+    edge:"You tend to play it safe. Some calculated risk, with clear limits on what you could lose, may be worth exploring." },
+  { id:"planner",  name:"Planner",           short:"Planner",    tag:"budgeting, systems, control",
+    strong:"You like a plan. Budgets, goals, and systems give you clarity and control over where money goes.",
+    edge:"Money may be handled more by feel than by plan. A simple monthly check-in on spending is a good starting system." },
+  { id:"abund",    name:"Abundance Thinker", short:"Abundance",  tag:"mindset and beliefs about money",
+    strong:"You believe opportunity is out there. You're optimistic about money and see it as a tool for good.",
+    edge:"Money may come with some worry or scarcity thinking. Tracking progress, even small wins, can build confidence." }
+];
+// 5 statements per archetype; exactly one is reverse-scored (marked true).
+const ITEM_BANK = {
+  builder:[["I get energy from finding new ways to earn income.",false],["I'd rather build something of my own than rely only on a paycheck.",false],["Earning more isn't something I think about much.",true],["When I want more money, my first thought is how to add more value.",false],["I often think about side projects or business ideas.",false]],
+  steward:[["I keep an emergency fund and protect it.",false],["I rarely think about protecting my savings from loss.",true],["I feel responsible for preserving what I already have.",false],["Before a big purchase, I think about what could go wrong.",false],["I take care of the things I own so they last.",false]],
+  growth:[["Investing feels too complicated to be worth my time.",true],["I like learning how investments grow over time.",false],["I invest money regularly, even small amounts.",false],["I think in terms of long-term growth rather than quick wins.",false],["I'd rather put extra money to work than let it sit.",false]],
+  giver:[["Giving to people or causes I care about is part of how I use money.",false],["I feel good when my money helps someone else.",false],["I set aside money specifically for generosity.",false],["I'd rather keep my money for myself than give it away.",true],["I'm quick to help friends or family when they're in need.",false]],
+  minimal:[["I'm happy with less than most people I know.",false],["I avoid buying things I don't really need.",false],["I value free time more than having more stuff.",false],["I know how much is enough for me.",false],["I often buy things to make myself feel better.",true]],
+  risk:[["I'm comfortable taking big risks for a big reward.",false],["I avoid any money decision where I could lose money.",true],["I'd consider borrowing money to seize a good opportunity.",false],["I get excited by bold financial moves.",false],["I act fast when I see an opening, even without every detail.",false]],
+  planner:[["I follow a budget most months.",false],["I know roughly where my money went last month.",false],["I usually figure out money as I go rather than plan ahead.",true],["I have written money goals with target dates.",false],["I use systems like apps, spreadsheets, or automatic transfers to manage money.",false]],
+  abund:[["I believe there are plenty of opportunities to earn more.",false],["I think I deserve to be paid well for my work.",false],["I feel optimistic about my financial future.",false],["I see money as a tool for good, not something to fear.",false],["I often worry there will never be enough money.",true]]
+};
+// Interleave so each screen mixes archetypes: 40 items, 5 per screen.
+const ITEMS = [];
+for (let k=0;k<5;k++) ARCH.forEach(a=>{ const [text,reverse]=ITEM_BANK[a.id][k]; ITEMS.push({ id:a.id+"-"+(k+1), a:a.id, text, reverse }); });
+const PER_PAGE = 5, MANDALA_PAGES = ITEMS.length / PER_PAGE, MAX_SKIPS = 4;
+
+/* Coaching prompts for the team lead, picked by rules below. */
+const COACH = {
+  primary:{
+    D:["Give them the goal and the deadline, then let them own how they get there.","Keep updates short and lead with the bottom line."],
+    I:["Give them visible chances to present, pitch, or rally the team.","Follow big conversations with a short written recap so details stick."],
+    S:["Give advance notice before changes, and explain the why.","Check in one-on-one; they may not raise concerns in a group."],
+    C:["Send written briefs and examples before verbal handoffs.","Allow time to research before asking for a decision."]
+  },
+  blind:{
+    D:"Invite them to make the call on smaller decisions to build confidence in taking charge.",
+    I:"Pair them with a connector when a project needs buy-in from other people.",
+    S:"Set checkpoints on long projects; they may be tempted to rush the finish.",
+    C:"Add a simple checklist or review step for detail-heavy work."
+  },
+  money:{
+    builder:"Tie goals to growth they can see: new clients, new revenue, new skills.",
+    steward:"Frame changes in terms of risk reduced and resources protected.",
+    growth:"Show how today's effort compounds. Long-term development plans land well.",
+    giver:"Connect their work to who it helps, and recognize their contributions to the team.",
+    minimal:"Keep processes lean. They'll often spot waste that others miss.",
+    risk:"Give them room to experiment, with clear guardrails on what's at stake.",
+    planner:"Share roadmaps and budgets early. They work best with a clear plan.",
+    abund:"Use their optimism to energize new initiatives, and pair them with a planner for follow-through."
+  }
+};
+
+/* =====================================================================
+   Storage (one key per device)
+   ===================================================================== */
+const KEY = "teamquiz.v1", OUTBOX = "teamquiz.outbox";
+let storageOK = true, memStore = {};
+function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ storageOK=false; return memStore[k]||null; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){ storageOK=false; memStore[k]=v; } }
+try{ localStorage.setItem("teamquiz.probe","1"); localStorage.removeItem("teamquiz.probe"); }catch(e){ storageOK=false; }
+
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+function fresh(profile){
+  return { v:1, id:uid(), createdAt:Date.now(), consent:false, step:"welcome", profile:profile||{},
+    disc:{ seed:Math.floor(Math.random()*2**31), i:0, a:{} },
+    mandala:{ skipped:false, page:0, a:{} },
+    result:null, sent:null };
+}
+function load(){
+  const raw = lsGet(KEY); if (!raw) return null;
+  try { const s = JSON.parse(raw); if (s && s.v === 1) return s; }
+  catch(e){ lsSet("teamquiz.corrupt-"+Date.now(), raw); }
+  return null;
+}
+let S = load() || fresh();
+let savedTimer;
+function save(flash){
+  lsSet(KEY, JSON.stringify(S));
+  if (flash){ const el=document.getElementById("saved"); el.classList.add("on"); clearTimeout(savedTimer); savedTimer=setTimeout(()=>el.classList.remove("on"),1400); }
+}
+
+/* =====================================================================
+   Scoring
+   ===================================================================== */
+function mulberry32(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function orderFor(seed, i){ const r=mulberry32(seed + i*7919); const o=[0,1,2,3]; for(let k=3;k>0;k--){ const j=Math.floor(r()*(k+1)); [o[k],o[j]]=[o[j],o[k]]; } return o; }
+
+function scoreDisc(ans){
+  const raw={D:0,I:0,S:0,C:0}; let answered=0;
+  DISC_BLOCKS.forEach(b=>{ const x=ans[b.id]; if (x && x.most && x.least){ raw[x.most]++; raw[x.least]--; answered++; } });
+  const pct={}; DIMS.forEach(d=>pct[d]=Math.round((raw[d]+28)/56*100));
+  const max=Math.max(...DIMS.map(d=>raw[d])), min=Math.min(...DIMS.map(d=>raw[d]));
+  const primary=DIMS.filter(d=>raw[d]===max);
+  let secondary=[];
+  if (primary.length===1){
+    const rest=DIMS.filter(d=>raw[d]<max); const m2=Math.max(...rest.map(d=>raw[d]));
+    secondary = m2===min && rest.every(d=>raw[d]===min) ? [] : rest.filter(d=>raw[d]===m2);
+  }
+  const blind = max===min ? [] : DIMS.filter(d=>raw[d]===min && !secondary.includes(d));
+  return { raw, pct, primary, secondary, blind, answered };
+}
+function discLabel(r){
+  if (r.primary.length===4) return "Even across all four";
+  if (r.primary.length>1) return r.primary.join("/")+" (tied)";
+  if (r.secondary.length===1) return r.primary[0]+"/"+r.secondary[0];
+  return r.primary[0];
+}
+function discTitle(r){
+  if (r.primary.length===4) return "An even blend of all four styles";
+  if (r.primary.length>1) return "Equal parts "+r.primary.map(d=>DISC[d].name).join(" and ");
+  const p=DISC[r.primary[0]].name;
+  if (r.secondary.length===1) return p+" with "+DISC[r.secondary[0]].name;
+  return p;
+}
+
+function scoreMandala(ans){
+  const scores={};
+  ARCH.forEach(a=>{
+    const vals = ITEMS.filter(it=>it.a===a.id && ans[it.id]).map(it=> it.reverse ? 6-ans[it.id] : ans[it.id]);
+    if (!vals.length){ scores[a.id]=null; return; }
+    const sum = vals.reduce((x,y)=>x+y,0);
+    const raw = vals.length===5 ? sum : Math.round(sum/vals.length*5*10)/10;
+    scores[a.id] = { raw, pct:Math.round((raw-5)/20*100), n:vals.length, estimated:vals.length<4 };
+  });
+  const scored = ARCH.filter(a=>scores[a.id]).map(a=>({id:a.id,pct:scores[a.id].pct}));
+  // Top 2 (or bottom 2). Ties are included, but a tie wider than 3 means nothing stands out.
+  const pick = sorted => {
+    if (!sorted.length) return [];
+    const g1 = sorted.filter(x=>x.pct===sorted[0].pct);
+    if (g1.length>1) return g1.length<=3 ? g1 : [];
+    const rest = sorted.slice(1); if (!rest.length) return g1;
+    const g2 = rest.filter(x=>x.pct===rest[0].pct);
+    return g2.length<=2 ? g1.concat(g2) : g1;
+  };
+  const dominant = pick(scored.slice().sort((x,y)=>y.pct-x.pct)).map(x=>x.id);
+  const edges = pick(scored.filter(x=>!dominant.includes(x.id)).sort((x,y)=>x.pct-y.pct)).map(x=>x.id);
+  const mean = scored.reduce((s,x)=>s+x.pct,0)/(scored.length||1);
+  const sd = Math.round(Math.sqrt(scored.reduce((s,x)=>s+(x.pct-mean)**2,0)/(scored.length||1))*10)/10;
+  const balance = sd<12 ? "Balanced" : sd<=20 ? "Moderately skewed" : "Highly concentrated";
+  return { scores, dominant, edges, sd, balance };
+}
+
+function coachingFor(disc, money){
+  const out=[];
+  disc.primary.slice(0,2).forEach(d=>out.push(COACH.primary[d][0]));
+  if (disc.primary.length===1) out.push(COACH.primary[disc.primary[0]][1]);
+  if (disc.blind.length===1) out.push(COACH.blind[disc.blind[0]]);
+  if (money) money.dominant.slice(0,2).forEach(id=>{ if (out.length<5) out.push(COACH.money[id]); });
+  return out.slice(0,5);
+}
+
+function computeResult(){
+  const disc = scoreDisc(S.disc.a);
+  const money = S.mandala.skipped ? null : scoreMandala(S.mandala.a);
+  return { completedAt:Date.now(), disc, money, coaching:coachingFor(disc, money) };
+}
+
+/* =====================================================================
+   Sending to Google Forms
+   ===================================================================== */
+const archName = id => (ARCH.find(a=>a.id===id)||{}).name || id;
+function buildPayload(){
+  const r=S.result, p=S.profile, d=r.disc, m=r.money;
+  const discAns = DISC_BLOCKS.map(b=>{ const x=S.disc.a[b.id]; return x&&x.most&&x.least ? x.most+x.least : "--"; }).join(",");
+  const moneyAns = m ? ITEMS.map(it=>S.mandala.a[it.id]||0).join("") : "";
+  const data = { v:1, id:S.id, completedAt:new Date(r.completedAt).toISOString(),
+    profile:{ name:p.name, email:p.email, role:p.role||"", team:p.team||"", start:p.start||"", manager:p.manager||"" },
+    disc:{ raw:d.raw, pct:d.pct, primary:d.primary, secondary:d.secondary, blind:d.blind, a:discAns },
+    money: m ? { scores:m.scores, dominant:m.dominant, edges:m.edges, sd:m.sd, balance:m.balance, a:moneyAns } : null,
+    coaching:r.coaching };
+  return {
+    name:p.name, email:p.email, role:p.role||"", team:p.team||"", start:p.start||"", manager:p.manager||"",
+    discstyle: discLabel(d)+" · "+discTitle(d),
+    discscores: DIMS.map(k=>k+" "+d.pct[k]).join(" · "),
+    moneystyle: m ? "Top: "+(m.dominant.map(archName).join(", ")||"none stand out")+" · Growth edges: "+(m.edges.map(archName).join(", ")||"none")+" · "+m.balance : "Skipped",
+    coaching: r.coaching.map(t=>"• "+t).join("\n"),
+    data: JSON.stringify(data)
+  };
+}
+function formReady(){ const g=CONFIG.googleForm; return !!(g.formId && g.fields.data && g.fields.name); }
+async function postToForm(payload){
+  const g=CONFIG.googleForm, body=new URLSearchParams();
+  Object.keys(g.fields).forEach(k=>{ if (g.fields[k]) body.append(g.fields[k], payload[k] ?? ""); });
+  await fetch("https://docs.google.com/forms/d/e/"+encodeURIComponent(g.formId)+"/formResponse", { method:"POST", mode:"no-cors", body });
+}
+function readOutbox(){ try{ return JSON.parse(lsGet(OUTBOX)||"[]"); }catch(e){ return []; } }
+function writeOutbox(list){ lsSet(OUTBOX, JSON.stringify(list)); }
+async function sendResults(){
+  if (!formReady()){ S.sent={status:"not-configured"}; save(); return; }
+  S.sent={status:"sending"}; save(); render();
+  const payload=buildPayload();
+  try { await postToForm(payload); S.sent={status:"sent", at:Date.now()}; }
+  catch(e){ const ob=readOutbox().filter(x=>x.id!==S.id); ob.push({id:S.id,payload}); writeOutbox(ob); S.sent={status:"queued"}; }
+  save(); render();
+}
+async function flushOutbox(){
+  if (!formReady()) return;
+  const ob=readOutbox(); if (!ob.length) return;
+  const left=[];
+  for (const job of ob){ try{ await postToForm(job.payload); if (S.id===job.id){ S.sent={status:"sent",at:Date.now()}; save(); } } catch(e){ left.push(job); } }
+  writeOutbox(left); if (S.step==="results") render();
+}
+window.addEventListener("online", flushOutbox);
+
+/* =====================================================================
+   Rendering
+   ===================================================================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const team = () => CONFIG.companyName ? esc(CONFIG.companyName) : "the team";
+const app = $("#app");
+
+function setBar(html){ const bar=$("#bar"); if (!html){ bar.hidden=true; return; } $("#barIn").innerHTML=html; bar.hidden=false; }
+function progress(label, n, total){
+  return `<div class="progress" aria-live="polite"><div class="progress-row"><span>${label}</span><b>${n} of ${total}</b></div><div class="track" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${n}"><i style="width:${Math.round(n/total*100)}%"></i></div></div>`;
+}
+let focusTop = false;
+function go(step){ S.step=step; save(); focusTop=true; render(); }
+
+function render(){
+  $("#storageBanner").hidden = storageOK;
+  $("#brandName").textContent = CONFIG.companyName ? CONFIG.companyName+" · Team Profile" : "Team Profile";
+  if (location.hash === "#setup") return renderSetup();
+  const views = { welcome:vWelcome, profile:vProfile, disc:vDisc, mandalaIntro:vMandalaIntro, mandala:vMandala, review:vReview, results:vResults };
+  (views[S.step]||vWelcome)();
+  if (focusTop){ focusTop=false; window.scrollTo({top:0}); app.focus({preventScroll:true}); }
+}
+
+/* ---------- welcome ---------- */
+function vWelcome(){
+  const inProgress = S.consent && S.step==="welcome";
+  app.innerHTML = `<div class="stack fade">
+    <div class="stack" style="gap:10px">
+      <div class="eyebrow">Welcome to ${team()}</div>
+      <h1>Let's learn how you work best.</h1>
+      <p class="lead">Two short self-reflection quizzes: one on your work style, one on your money mindset. There are no right or wrong answers.</p>
+    </div>
+    <div class="facts">
+      <div class="fact"><b>~15</b><span>minutes</span></div>
+      <div class="fact"><b>2</b><span>parts</span></div>
+      <div class="fact"><b>Auto</b><span>saves as you go</span></div>
+    </div>
+    <div class="card stack">
+      <h3>Before you start</h3>
+      <ul class="plain small">
+        <li>When you finish, your answers and results are sent to ${esc(CONFIG.leadName)} so they can support you better.</li>
+        <li>This is for coaching and team development only. It isn't used for hiring, pay, or promotion decisions.</li>
+        <li>Part 2 asks about your attitudes toward money. It's optional; you can skip it.</li>
+        <li>This is a self-reflection tool, not a clinical assessment or financial advice.</li>
+      </ul>
+      <label class="consent"><input type="checkbox" id="consent" ${S.consent?"checked":""}><span class="small">I understand and agree to share my results with ${esc(CONFIG.leadName)}.</span></label>
+    </div>
+  </div>`;
+  $("#consent").addEventListener("change", e=>{ S.consent=e.target.checked; save(); $("#startBtn").disabled=!S.consent; });
+  setBar(`<button class="btn primary" id="startBtn" ${S.consent?"":"disabled"}>${inProgress?"Continue":"Get started"}</button>`);
+  $("#startBtn").onclick = ()=>go("profile");
+}
+
+/* ---------- profile ---------- */
+function vProfile(){
+  const p=S.profile;
+  const f=(id,label,type,opt,auto)=>`<label class="f ${id==="name"||id==="email"?"":""}">${label}${opt?' <span class="opt">optional</span>':""}
+    <input type="${type}" id="p_${id}" value="${esc(p[id]||"")}" ${auto?`autocomplete="${auto}"`:""} ${type==="email"?'inputmode="email" autocapitalize="off"':""}><span class="err" id="e_${id}"></span></label>`;
+  app.innerHTML = `<div class="stack fade">
+    <div><div class="eyebrow">Step 1 of 3</div><h2 style="margin-top:6px">About you</h2></div>
+    <div class="card"><div class="fields">
+      <div class="full">${f("name","Full name","text",false,"name")}</div>
+      <div class="full">${f("email","Email","email",false,"email")}</div>
+      ${f("role","Role or job title","text",true,"organization-title")}
+      ${f("team","Team or department","text",true)}
+      ${f("start","Start date","date",true)}
+      ${f("manager","Manager","text",true)}
+    </div></div>
+  </div>`;
+  ["name","email","role","team","start","manager"].forEach(k=>{
+    $("#p_"+k).addEventListener("input", e=>{ S.profile[k]=e.target.value; save(); if (k==="name"||k==="email") validate(false); });
+  });
+  setBar(`<button class="btn ghost" id="back">Back</button><button class="btn primary" id="next">Start Part 1</button>`);
+  $("#back").onclick=()=>go("welcome");
+  $("#next").onclick=()=>{ if (validate(true)) go(S.disc.i>=DISC_BLOCKS.length ? "review" : "disc"); };
+}
+function validate(show){
+  const name=(S.profile.name||"").trim(), email=(S.profile.email||"").trim();
+  const errs={ name: name.length<2 ? "Enter your full name." : "", email: !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) ? "Enter an email like name@example.com." : "" };
+  ["name","email"].forEach(k=>{
+    const input=$("#p_"+k), el=$("#e_"+k);
+    if (show || input.value) { el.textContent = show || errs[k]==="" ? errs[k] : (input===document.activeElement ? "" : errs[k]); input.setAttribute("aria-invalid", !!errs[k] && show); }
+  });
+  if (show && (errs.name||errs.email)) $("#p_"+(errs.name?"name":"email")).focus();
+  return !errs.name && !errs.email;
+}
+
+/* ---------- DISC ---------- */
+function vDisc(){
+  const i=Math.min(S.disc.i, DISC_BLOCKS.length-1), b=DISC_BLOCKS[i], ans=S.disc.a[b.id]||{};
+  const order=orderFor(S.disc.seed, i);
+  app.innerHTML = `<div class="fade">
+    ${progress("Part 1 · Work style", i+1, DISC_BLOCKS.length)}
+    <div class="card">
+      <p class="block-q">Pick the one that is <b>most</b> like you at work, and the one that is <b>least</b> like you.</p>
+      <div class="stmts" role="group" aria-label="Block ${i+1}">
+        ${order.map(k=>{ const [text,d]=b.s[k]; const m=ans.most===d, l=ans.least===d;
+          return `<div class="stmt ${m?"is-most":""} ${l?"is-least":""}">
+            <span class="stmt-text" id="t_${d}">${esc(text)}</span>
+            <button class="pick most" data-d="${d}" aria-pressed="${m}" aria-label="Most like me: ${esc(text)}">Most</button>
+            <button class="pick least" data-d="${d}" aria-pressed="${l}" aria-label="Least like me: ${esc(text)}">Least</button>
+          </div>`; }).join("")}
+      </div>
+      <p class="hint" id="hint" aria-live="polite">${ans.most&&ans.least ? "" : !ans.most&&!ans.least ? "Choose one Most and one Least." : ans.most ? "Now choose one Least." : "Now choose one Most."}</p>
+    </div>
+  </div>`;
+  app.querySelectorAll(".pick").forEach(btn=>btn.addEventListener("click", ()=>{
+    const d=btn.dataset.d, kind=btn.classList.contains("most")?"most":"least", other=kind==="most"?"least":"most";
+    const cur={...(S.disc.a[b.id]||{})};
+    let swapped=false;
+    cur[kind] = cur[kind]===d ? undefined : d;
+    if (cur[kind] && cur[other]===d){ cur[other]=undefined; swapped=true; }
+    S.disc.a[b.id]=cur; save(true); vDisc();
+    if (swapped){ const h=$("#hint"); h.textContent="A statement can't be both Most and Least. Pick a different one for "+(other==="most"?"Most":"Least")+"."; h.classList.add("warn"); }
+    const again=app.querySelector(`.pick.${kind}[data-d="${d}"]`); if (again) again.focus();
+  }));
+  const done = ans.most && ans.least;
+  const fromReview = S.disc.fromReview;
+  setBar(`<button class="btn ghost" id="back">Back</button><button class="btn primary" id="next" ${done?"":"disabled"}>${fromReview?"Back to review":i===DISC_BLOCKS.length-1?"Finish Part 1":"Next"}</button>`);
+  $("#back").onclick=()=>{ if (i===0) go("profile"); else { S.disc.i=i-1; save(); focusTop=true; render(); } };
+  $("#next").onclick=()=>{
+    if (fromReview){ S.disc.fromReview=false; go("review"); return; }
+    if (i===DISC_BLOCKS.length-1){ S.disc.i=DISC_BLOCKS.length; go(S.mandala.page>0||Object.keys(S.mandala.a).length ? "mandala" : "mandalaIntro"); }
+    else { S.disc.i=i+1; save(); focusTop=true; render(); }
+  };
+}
+
+/* ---------- Mandala ---------- */
+function vMandalaIntro(){
+  app.innerHTML = `<div class="stack fade">
+    <div><div class="eyebrow">Part 2 of 2 · Optional</div><h2 style="margin-top:6px">Your money mindset</h2></div>
+    <div class="card stack">
+      <p>Forty short statements about how you think about money. Rate each one from <b>1 (strongly disagree)</b> to <b>5 (strongly agree)</b>.</p>
+      <p class="muted small">This is a self-reflection tool, not financial advice. It asks about attitudes, never amounts. If you'd rather not answer, you can skip this part and still finish.</p>
+    </div>
+  </div>`;
+  setBar(`<button class="btn ghost" id="skip">Skip this part</button><button class="btn primary" id="go">Start Part 2</button>`);
+  $("#skip").onclick=()=>{ S.mandala.skipped=true; go("review"); };
+  $("#go").onclick=()=>{ S.mandala.skipped=false; S.mandala.page=0; go("mandala"); };
+}
+function vMandala(){
+  const pg=Math.min(S.mandala.page, MANDALA_PAGES-1), items=ITEMS.slice(pg*PER_PAGE, pg*PER_PAGE+PER_PAGE);
+  const answered=Object.keys(S.mandala.a).length;
+  app.innerHTML = `<div class="fade">
+    ${progress("Part 2 · Money mindset", answered, ITEMS.length)}
+    <div class="card"><div class="items">
+      ${items.map((it,n)=>{ const v=S.mandala.a[it.id];
+        return `<div class="item ${S.mandala.showMissing&&!v?"missing":""}" role="radiogroup" aria-labelledby="q_${it.id}">
+          <p id="q_${it.id}"><span class="muted" style="font-weight:500">${pg*PER_PAGE+n+1}.</span> ${esc(it.text)}</p>
+          <div class="scale">${[1,2,3,4,5].map(x=>`<button data-id="${it.id}" data-v="${x}" aria-pressed="${v===x}" aria-label="${x} of 5${x===1?", strongly disagree":x===5?", strongly agree":""}">${x}</button>`).join("")}</div>
+          <div class="scale-ends"><span>Strongly disagree</span><span>Strongly agree</span></div>
+        </div>`; }).join("")}
+    </div></div>
+    <p class="muted small" style="margin-top:12px">Screen ${pg+1} of ${MANDALA_PAGES}</p>
+  </div>`;
+  app.querySelectorAll(".scale button").forEach(btn=>btn.addEventListener("click", ()=>{
+    const id=btn.dataset.id, v=+btn.dataset.v;
+    if (S.mandala.a[id]===v) delete S.mandala.a[id]; else S.mandala.a[id]=v;
+    save(true);
+    btn.parentElement.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed", x===btn && S.mandala.a[id]===v));
+    btn.closest(".item").classList.remove("missing");
+    const pr=app.querySelector(".progress"); const n=Object.keys(S.mandala.a).length;
+    pr.querySelector("b").textContent=n+" of "+ITEMS.length; pr.querySelector(".track i").style.width=Math.round(n/ITEMS.length*100)+"%";
+  }));
+  const fromReview=S.mandala.fromReview;
+  setBar(`<button class="btn ghost" id="back">Back</button><button class="btn primary" id="next">${fromReview?"Back to review":pg===MANDALA_PAGES-1?"Review answers":"Next"}</button>`);
+  $("#back").onclick=()=>{ S.mandala.showMissing=false; if (pg===0) go("mandalaIntro"); else { S.mandala.page=pg-1; save(); focusTop=true; render(); } };
+  $("#next").onclick=()=>{
+    if (fromReview){ S.mandala.fromReview=false; go("review"); return; }
+    if (pg===MANDALA_PAGES-1) go("review"); else { S.mandala.page=pg+1; save(); focusTop=true; render(); }
+  };
+}
+
+/* ---------- review ---------- */
+let confirmSkips=false;
+function vReview(){
+  const discDone=DISC_BLOCKS.filter(b=>{ const x=S.disc.a[b.id]; return x&&x.most&&x.least; }).length;
+  const discMissing=DISC_BLOCKS.length-discDone;
+  const mAns=Object.keys(S.mandala.a).length, mMissing=ITEMS.length-mAns;
+  const skipped=S.mandala.skipped;
+  const tooMany=!skipped && mMissing>MAX_SKIPS;
+  app.innerHTML = `<div class="stack fade">
+    <div><div class="eyebrow">Step 3 of 3</div><h2 style="margin-top:6px">Review before you submit</h2>
+      <p class="muted" style="margin-top:6px">Tap any number to change an answer. Results appear after you submit.</p></div>
+    <div class="card stack">
+      <div class="status-row"><h3>Part 1 · Work style</h3>${discMissing?`<span class="chip bad">${discMissing} left</span>`:`<span class="chip good">Complete</span>`}</div>
+      <div class="grid-jump">${DISC_BLOCKS.map((b,i)=>{ const x=S.disc.a[b.id]; const ok=x&&x.most&&x.least;
+        return `<button class="jump ${ok?"ok":""}" data-disc="${i}" aria-label="Block ${i+1}${ok?"":", not answered"}">${i+1}</button>`; }).join("")}</div>
+      ${discMissing?`<p class="small" style="color:var(--bad)">Every Part 1 block needs a Most and a Least before you can submit.</p>`:""}
+    </div>
+    <div class="card stack">
+      <div class="status-row"><h3>Part 2 · Money mindset</h3>${skipped?`<span class="chip">Skipped</span>`:mMissing?`<span class="chip ${tooMany?"bad":"warn"}">${mMissing} unanswered</span>`:`<span class="chip good">Complete</span>`}</div>
+      ${skipped?`<p class="small muted">You chose to skip this part.</p><div><button class="btn ghost" id="unskip">Answer Part 2 after all</button></div>`:`
+      <div class="grid-jump" style="grid-template-columns:repeat(4,1fr)">${Array.from({length:MANDALA_PAGES},(_,p)=>{ const n=ITEMS.slice(p*PER_PAGE,p*PER_PAGE+PER_PAGE).filter(it=>S.mandala.a[it.id]).length;
+        return `<button class="jump ${n===PER_PAGE?"ok":""}" data-page="${p}" aria-label="Screen ${p+1}, ${n} of ${PER_PAGE} answered">Screen ${p+1}${n<PER_PAGE?` · ${PER_PAGE-n}`:""}</button>`; }).join("")}</div>
+      ${tooMany?`<p class="small" style="color:var(--bad)">Answer at least ${ITEMS.length-MAX_SKIPS} of ${ITEMS.length}, or skip Part 2.</p><div><button class="btn quiet" id="skip2">Skip Part 2 instead</button></div>`:mMissing?`<p class="small" style="color:var(--warn)">You can submit with ${mMissing} unanswered; those scores will be estimated.</p>`:""}`}
+    </div>
+  </div>`;
+  app.querySelectorAll("[data-disc]").forEach(b=>b.onclick=()=>{ S.disc.i=+b.dataset.disc; S.disc.fromReview=true; go("disc"); });
+  app.querySelectorAll("[data-page]").forEach(b=>b.onclick=()=>{ S.mandala.page=+b.dataset.page; S.mandala.fromReview=true; S.mandala.showMissing=true; go("mandala"); });
+  const un=$("#unskip"); if (un) un.onclick=()=>{ S.mandala.skipped=false; go(Object.keys(S.mandala.a).length?"mandala":"mandalaIntro"); };
+  const sk=$("#skip2"); if (sk) sk.onclick=()=>{ S.mandala.skipped=true; save(); render(); };
+  const blocked = discMissing>0 || tooMany;
+  const needsConfirm = !skipped && mMissing>0 && !tooMany;
+  setBar(`<button class="btn ghost" id="back">Back</button><button class="btn primary" id="submit" ${blocked?"disabled":""}>${needsConfirm&&confirmSkips?`Submit with ${mMissing} unanswered`:"Submit"}</button>`);
+  $("#back").onclick=()=>{ confirmSkips=false; if (skipped) go("mandalaIntro"); else { S.mandala.page=MANDALA_PAGES-1; go("mandala"); } };
+  $("#submit").onclick=()=>{
+    if (needsConfirm && !confirmSkips){ confirmSkips=true; vReview(); $("#submit").focus(); return; }
+    confirmSkips=false;
+    S.result=computeResult(); go("results"); sendResults();
+  };
+}
+
+/* ---------- results ---------- */
+function discBars(d){
+  return `<div class="bars">${DIMS.map(k=>`<div class="brow"><span class="lab"><i style="background:var(--${k})">${k}</i>${DISC[k].name.length>11?DISC[k].name.slice(0,9)+".":DISC[k].name}</span>
+    <span class="bt" aria-hidden="true"><b style="width:${d.pct[k]}%;background:var(--${k})"></b></span><span class="val">${d.pct[k]}</span></div>`).join("")}</div>`;
+}
+function radarSVG(scores){
+  const W=380,H=330,cx=190,cy=165,R=108, n=ARCH.length;
+  const pt=(i,r)=>{ const a=-Math.PI/2 + i*2*Math.PI/n; return [cx+r*Math.cos(a), cy+r*Math.sin(a)]; };
+  let g="";
+  [25,50,75,100].forEach(v=>{ g+=`<polygon class="grid" points="${ARCH.map((_,i)=>pt(i,R*v/100).join(",")).join(" ")}"/>`; });
+  ARCH.forEach((_,i)=>{ const [x,y]=pt(i,R); g+=`<line class="axis" x1="${cx}" y1="${cy}" x2="${x}" y2="${y}"/>`; });
+  const vals=ARCH.map(a=>scores[a.id]?scores[a.id].pct:0);
+  g+=`<polygon class="shape" points="${vals.map((v,i)=>pt(i,Math.max(2,R*v/100)).join(",")).join(" ")}"/>`;
+  vals.forEach((v,i)=>{ const [x,y]=pt(i,Math.max(2,R*v/100)); g+=`<circle class="pt" cx="${x}" cy="${y}" r="3.5"/>`; });
+  ARCH.forEach((a,i)=>{ const [x,y]=pt(i,R+20); const anchor=Math.abs(x-cx)<4?"middle":x>cx?"start":"end";
+    g+=`<text x="${x}" y="${y+4}" text-anchor="${anchor}">${esc(a.short)}</text>`; });
+  g+=`<text x="${cx+3}" y="${cy-R*.5+4}" style="font-size:9.5px;opacity:.7">50</text>`;
+  return `<svg class="radar" viewBox="0 0 ${W} ${H}" role="img" aria-label="Money mindset radar chart">${g}</svg>`;
+}
+function resultsHTML(forExport){
+  const r=S.result, d=r.disc, m=r.money, p=S.profile;
+  const tiles = d.primary.length===4 ? DIMS : d.primary.concat(d.secondary.length===1?d.secondary:[]);
+  const blend = d.primary.length===1 && d.secondary.length===1 ? BLENDS[d.primary[0]+d.secondary[0]] : d.primary.length>1 && d.primary.length<4 ? "Your top styles are tied, so you draw on each of them about equally. Read both descriptions below." : "";
+  const date = new Date(r.completedAt).toLocaleDateString(undefined,{year:"numeric",month:"long",day:"numeric"});
+  return `
+  <div class="stack">
+    <div class="stack" style="gap:8px">
+      <div class="eyebrow">${esc(p.name)} · ${date}</div>
+      <div class="hero-style"><div class="style-tiles" aria-hidden="true">${tiles.map(k=>`<span style="background:var(--${k})">${k}</span>`).join("")}</div>
+        <div><h1 style="font-size:clamp(24px,5.5vw,32px)">${esc(discTitle(d))}</h1>${m&&m.dominant.length?`<p class="muted" style="margin-top:4px">Money mindset: ${m.dominant.map(archName).join(" and ")}</p>`:""}</div></div>
+    </div>
+
+    <section class="card stack">
+      <div class="status-row"><h2>Work style</h2><span class="chip">${esc(discLabel(d))}</span></div>
+      ${discBars(d)}
+      ${blend?`<p class="note">${esc(blend)}</p>`:""}
+      ${d.primary.length<4 ? d.primary.map(k=>`<div class="stack" style="gap:4px"><h3>${DISC[k].name}</h3><p>${esc(DISC[k].about)}</p></div>`).join("") : `<p>Your answers spread evenly across all four styles. You adapt to what the situation needs.</p>`}
+      ${d.blind.length?`<div class="stack" style="gap:4px"><h3>Possible blind spot: ${d.blind.map(k=>DISC[k].name).join(", ")}</h3>${d.blind.map(k=>`<p class="muted">${esc(DISC[k].blind)}</p>`).join("")}</div>`:""}
+      <details class="no-print-open"><summary class="small muted" style="cursor:pointer">Score details</summary>
+        <table class="scores" style="margin-top:8px"><thead><tr><th>Style</th><th>Raw (−28 to 28)</th><th>Score (0–100)</th></tr></thead>
+        <tbody>${DIMS.map(k=>`<tr><td>${k} · ${DISC[k].name}</td><td>${d.raw[k]}</td><td>${d.pct[k]}</td></tr>`).join("")}</tbody></table></details>
+    </section>
+
+    ${m?`<section class="card stack">
+      <div class="status-row"><h2>Money mindset</h2><span class="chip">${esc(m.balance)}</span></div>
+      ${radarSVG(m.scores)}
+      <div class="pair">
+        <div class="stack" style="gap:6px"><div class="eyebrow">Strongest</div>${m.dominant.length?"":`<p class="small">No single archetype stands out. Your scores are close together.</p>`}${m.dominant.map(id=>{ const a=ARCH.find(x=>x.id===id); return `<h3>${a.name}</h3><p class="small">${esc(a.strong)}</p>`; }).join("")}</div>
+        <div class="stack" style="gap:6px"><div class="eyebrow">Growth edges</div>${m.edges.length?"":`<p class="small">None stand out.</p>`}${m.edges.map(id=>{ const a=ARCH.find(x=>x.id===id); return `<h3>${a.name}</h3><p class="small">${esc(a.edge)}</p>`; }).join("")}</div>
+      </div>
+      <p class="small muted">Balance: <b>${esc(m.balance)}</b> (spread ${m.sd}). Under 12 is balanced, 12 to 20 is moderately skewed, over 20 is highly concentrated.</p>
+      <table class="scores"><thead><tr><th>Archetype</th><th>Score (0–100)</th></tr></thead><tbody>
+        ${ARCH.map(a=>{ const s=m.scores[a.id]; return `<tr><td>${a.name} <span class="muted small">· ${a.tag}</span></td><td>${s?s.pct+(s.estimated?" (est.)":""):"—"}</td></tr>`; }).join("")}
+      </tbody></table>
+      <p class="small muted">A self-reflection tool, not financial advice.</p>
+    </section>`:""}
+
+    <section class="card stack">
+      <h2>How you work best</h2>
+      <p class="small muted">Shared with ${esc(CONFIG.leadName)} as tips for working with you.</p>
+      <ul class="tips">${r.coaching.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>
+    </section>
+  </div>`;
+}
+function sendStatus(){
+  const s=S.sent||{};
+  if (s.status==="sent") return `<span class="chip good">Sent to ${esc(CONFIG.leadName)}</span>`;
+  if (s.status==="sending") return `<span class="chip">Sending…</span>`;
+  if (s.status==="queued") return `<span class="chip warn">Not sent yet · will retry when you're online</span><button class="btn ghost" id="retry">Try again</button>`;
+  if (s.status==="not-configured") return `<span class="chip bad">Results form isn't connected yet</span>`;
+  return `<span class="chip">Not sent</span><button class="btn ghost" id="retry">Send</button>`;
+}
+function vResults(){
+  if (!S.result){ go("review"); return; }
+  app.innerHTML = `<div class="stack fade">
+    <div class="card sendbox" role="status" aria-live="polite">${sendStatus()}</div>
+    ${resultsHTML()}
+    <section class="card stack no-print">
+      <h3>Keep a copy</h3>
+      <div class="actions">
+        <button class="btn ghost" id="pdf">Save as PDF</button>
+        <button class="btn ghost" id="dl">Download a copy</button>
+        <a class="btn ghost full" id="mail" href="#">Email it to myself</a>
+      </div>
+      <p class="small muted">Your results also stay on this device. Open this link again to see them.</p>
+    </section>
+    <div class="no-print" style="text-align:center"><button class="btn quiet" id="again">Retake the quiz</button></div>
+  </div>`;
+  setBar(null);
+  const rt=$("#retry"); if (rt) rt.onclick=sendResults;
+  $("#pdf").onclick=()=>window.print();
+  $("#dl").onclick=downloadCopy;
+  $("#mail").href = mailtoLink();
+  $("#again").onclick=()=>{
+    const b=$("#again");
+    if (b.dataset.armed){ S=fresh({...S.profile}); S.consent=true; go("disc"); return; }
+    b.dataset.armed="1"; b.textContent="Tap again to start over (these results stay with your team lead)";
+  };
+}
+function summaryText(){
+  const r=S.result, d=r.disc, m=r.money;
+  let t=`Team Profile results for ${S.profile.name}\n\nWork style: ${discLabel(d)} (${discTitle(d)})\n${DIMS.map(k=>`${DISC[k].name}: ${d.pct[k]}`).join("\n")}\n`;
+  if (d.blind.length) t+=`Possible blind spot: ${d.blind.map(k=>DISC[k].name).join(", ")}\n`;
+  if (m) t+=`\nMoney mindset: ${m.dominant.map(archName).join(", ")||"no single standout"} (${m.balance})\n${ARCH.map(a=>`${a.name}: ${m.scores[a.id]?m.scores[a.id].pct:"-"}`).join("\n")}\nGrowth edges: ${m.edges.map(archName).join(", ")||"none"}\n`;
+  t+=`\nHow I work best:\n${r.coaching.map(x=>"- "+x).join("\n")}\n`;
+  return t;
+}
+function mailtoLink(){
+  return "mailto:"+encodeURIComponent(S.profile.email||"")+"?subject="+encodeURIComponent("My Team Profile results")+"&body="+encodeURIComponent(summaryText());
+}
+function downloadCopy(){
+  const css=document.querySelector("style").textContent;
+  const html=`<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Team Profile · ${esc(S.profile.name)}</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,650&family=Figtree:wght@400;500;600;700&display=swap">
+<style>${css}</style></head><body><div class="wrap" style="padding-bottom:40px">${resultsHTML(true)}</div></body></html>`;
+  const blob=new Blob([html],{type:"text/html"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="team-profile-"+(S.profile.name||"results").toLowerCase().replace(/[^a-z0-9]+/g,"-")+".html";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+}
+
+/* ---------- #setup helper (for the site owner) ---------- */
+function renderSetup(){
+  setBar(null);
+  app.innerHTML = `<div class="stack fade">
+    <div><div class="eyebrow">Owner setup</div><h2 style="margin-top:6px">Connect your Google Form</h2></div>
+    <div class="card stack">
+      <p class="small">In your Google Form, open the <b>⋮</b> menu, choose <b>Get pre-filled link</b>, and type these exact words into the matching questions:
+      <b>name, email, role, team, start, manager, discstyle, discscores, moneystyle, coaching, data</b>. Click <b>Get link</b>, copy it, and paste it here.</p>
+      <label class="f">Pre-filled link<input type="text" id="prefill" placeholder="https://docs.google.com/forms/d/e/…/viewform?usp=pp_url&entry.…"></label>
+      <span class="err" id="perr"></span>
+      <label class="f">Paste this over the <code>googleForm</code> block in index.html<textarea class="code" id="out" readonly></textarea></label>
+      <p class="small muted">Status: ${formReady()?`<span class="chip good">This copy of the site is connected</span>`:`<span class="chip warn">Not connected yet</span>`}</p>
+      <div><a class="btn ghost" href="#" id="exitSetup">Back to the quiz</a></div>
+    </div>
+  </div>`;
+  $("#exitSetup").onclick=e=>{ e.preventDefault(); history.replaceState(null,"",location.pathname); render(); };
+  $("#prefill").addEventListener("input", e=>{
+    const v=e.target.value.trim(), err=$("#perr"), out=$("#out"); out.value=""; err.textContent="";
+    if (!v) return;
+    let url; try{ url=new URL(v); }catch(x){ err.textContent="That isn't a full link. Copy the whole address that starts with https://"; return; }
+    const id=(url.pathname.match(/\/forms\/d\/e\/([^/]+)/)||[])[1];
+    if (!id){ err.textContent="Couldn't find the form id. Use the pre-filled link (it contains /forms/d/e/…)."; return; }
+    const fields={name:"",email:"",role:"",team:"",start:"",manager:"",discstyle:"",discscores:"",moneystyle:"",coaching:"",data:""};
+    url.searchParams.forEach((val,key)=>{ const k=val.trim().toLowerCase(); if (key.startsWith("entry.") && k in fields) fields[k]=key; });
+    const missing=Object.keys(fields).filter(k=>!fields[k]);
+    if (missing.length) err.textContent="Missing: "+missing.join(", ")+". Type those words into the matching questions and get a new link.";
+    out.value = "  googleForm: {\n    formId: "+JSON.stringify(id)+",\n    fields: {\n"+Object.keys(fields).map(k=>"      "+k+": "+JSON.stringify(fields[k])).join(",\n")+"\n    }\n  }";
+  });
+}
+
+/* ---------- boot ---------- */
+window.addEventListener("hashchange", ()=>render());
+$("#foot").innerHTML = `Your progress saves on this device as you go.`;
+render();
+flushOutbox();
+if (S.step==="results" && S.sent && S.sent.status==="sending") sendResults();
+</script>
+</body>
+</html>
