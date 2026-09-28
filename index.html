@@ -578,13 +578,10 @@ function vProfile(){
     <div class="card"><div class="fields">
       <div class="full">${f("name","Full name","text",false,"name")}</div>
       <div class="full">${f("email","Email","email",false,"email")}</div>
-      ${f("role","Role or job title","text",true,"organization-title")}
-      ${f("team","Team or department","text",true)}
-      ${f("start","Start date","date",true)}
-      ${f("manager","Manager","text",true)}
+      <div class="full">${f("manager","Mentor","text",true)}</div>
     </div></div>
   </div>`;
-  ["name","email","role","team","start","manager"].forEach(k=>{
+  ["name","email","manager"].forEach(k=>{
     $("#p_"+k).addEventListener("input", e=>{ S.profile[k]=e.target.value; save(); if (k==="name"||k==="email") validate(false); });
   });
   setBar(`<button class="btn ghost" id="back">Back</button><button class="btn primary" id="next">Start Part 1</button>`);
